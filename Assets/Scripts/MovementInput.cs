@@ -3,18 +3,18 @@
 [RequireComponent(typeof(CharacterController))]
 public class MovementInput : MonoBehaviour
 {
-    public float speed = 5f;
+    public float Velocity = 5f;
     public float desiredRotationSpeed = 0.1f;
     public float allowPlayerRotation = 0.1f;
-
-    private Animator animator;
-    private CharacterController controller;
 
     [Header("Animation Smoothing")]
     [Range(0, 1f)]
     public float StartAnimatorTime = 0.3f;
     [Range(0, 1f)]
     public float StopAnimatorTime = 0.15f;
+
+    private Animator animator;
+    private CharacterController controller;
 
     void Start()
     {
@@ -24,15 +24,15 @@ public class MovementInput : MonoBehaviour
 
     void Update()
     {
-        InputMagnitude();
+        HandleMovement();
     }
 
-    void InputMagnitude()
+    void HandleMovement()
     {
         float inputX = Input.GetAxis("Horizontal");
         float inputZ = Input.GetAxis("Vertical");
-
         Vector3 direction = new Vector3(inputX, 0, inputZ).normalized;
+
         float speed = direction.sqrMagnitude;
 
         if (speed > allowPlayerRotation)
@@ -55,7 +55,7 @@ public class MovementInput : MonoBehaviour
 
             Vector3 moveDirection = forward * direction.z + right * direction.x;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(moveDirection), desiredRotationSpeed);
-            controller.Move(Time.deltaTime * speed * moveDirection);
+            controller.Move(Time.deltaTime * Velocity * moveDirection);
         }
     }
 }
