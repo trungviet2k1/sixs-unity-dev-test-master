@@ -8,9 +8,11 @@ public class Ball : MonoBehaviour
 
     [Header("UI Canvas")]
     public GameObject kickButton;
+    public GameObject autoKickButton;
 
     [Header("Kick Force")]
-    public float kickForce = 10f;
+    public float kickForce;
+    public float autoKickCoefficient;
 
     [Header("Goals")]
     public Transform[] goals;
@@ -27,9 +29,11 @@ public class Ball : MonoBehaviour
     private void Start()
     {
         kickButton.SetActive(false);
+        autoKickButton.SetActive(true);
         ballRigidbody = GetComponent<Rigidbody>();
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         kickButton.GetComponent<Button>().onClick.AddListener(OnKickButtonPressed);
+        autoKickButton.GetComponent<Button>().onClick.AddListener(OnAutoKickButtonPressed);
     }
 
     private void Update()
@@ -58,9 +62,26 @@ public class Ball : MonoBehaviour
 
         AudioManager.Instance.PlayKickBallSound();
         Vector3 direction = (nearestGoal.position - transform.position).normalized;
-        ballRigidbody.AddForce(direction * kickForce, ForceMode.Impulse);
+        ballRigidbody.AddForce(kickForce * direction, ForceMode.Impulse);
         Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(transform, cameraTransitionDelay);
     }
+
+    public void OnAutoKickButtonPressed()
+    {
+        if (playerTransform == null) return;
+
+        Ball farthestBallScript = GetFarthestBall();
+        if (farthestBallScript == null || farthestBallScript.isInGoal) return;
+
+        Transform nearestGoal = farthestBallScript.GetNearestGoal();
+        if (nearestGoal == null) return;
+
+        AudioManager.Instance.PlayKickBallSound();
+        Vector3 direction = (nearestGoal.position - farthestBallScript.transform.position).normalized;
+        farthestBallScript.ballRigidbody.AddForce(autoKickCoefficient * kickForce * direction, ForceMode.Impulse);
+        Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(farthestBallScript.transform, cameraTransitionDelay);
+    }
+
 
     private Transform GetNearestGoal()
     {
@@ -78,6 +99,27 @@ public class Ball : MonoBehaviour
         }
 
         return nearestGoal;
+    }
+
+    private Ball GetFarthestBall()
+    {
+        Ball[] allBalls = FindObjectsOfType<Ball>();
+        Ball farthestBall = null;
+        float longestDistance = 0f;
+
+        foreach (Ball ball in allBalls)
+        {
+            if (ball.isInGoal) continue;
+
+            float distance = Vector3.Distance(playerTransform.position, ball.transform.position);
+            if (distance > longestDistance)
+            {
+                longestDistance = distance;
+                farthestBall = ball;
+            }
+        }
+
+        return farthestBall;
     }
 
     private void OnCollisionEnter(Collision collision)

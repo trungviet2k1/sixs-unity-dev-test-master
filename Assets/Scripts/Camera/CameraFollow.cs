@@ -8,8 +8,9 @@ public class CameraFollow : MonoBehaviour
 
     private Transform defaultCamTarget;
     private Vector3 defaultCamOffset;
-    private bool isFollowingPlayer = true;
     private Transform currentTarget;
+
+    [HideInInspector] public bool isFollowingPlayer = true;
 
     void Start()
     {
@@ -30,14 +31,6 @@ public class CameraFollow : MonoBehaviour
     public void SwitchTargetTo(Transform ball, float delay)
     {
         StopAllCoroutines();
-
-        if (!isFollowingPlayer)
-        {
-            transform.position = ball.position + offset;
-            transform.LookAt(ball);
-            return;
-        }
-
         StartCoroutine(WaitAndSwitchTarget(ball, delay));
     }
 

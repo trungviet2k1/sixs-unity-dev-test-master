@@ -171,7 +171,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rangeRadius: 1.5
   kickButton: {fileID: 0}
+  autoKickButton: {fileID: 0}
   kickForce: 13
+  autoKickCoefficient: 0.3
   goals:
   - {fileID: 0}
   - {fileID: 0}
