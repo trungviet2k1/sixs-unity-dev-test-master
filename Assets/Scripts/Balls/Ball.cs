@@ -27,52 +27,37 @@ public class Ball : MonoBehaviour
     {
         kickButton.SetActive(false);
         ballRigidbody = GetComponent<Rigidbody>();
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            playerTransform = player.transform;
-        }
-
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         kickButton.GetComponent<Button>().onClick.AddListener(OnKickButtonPressed);
     }
 
     private void Update()
     {
-        if (playerTransform != null)
+        if (playerTransform == null) return;
+
+        float distance = Vector3.Distance(transform.position, playerTransform.position);
+        if (distance <= rangeRadius && !isPlayerInRange)
         {
-            float distance = Vector3.Distance(transform.position, playerTransform.position);
-            if (distance <= rangeRadius)
-            {
-                if (!isPlayerInRange)
-                {
-                    isPlayerInRange = true;
-                    kickButton.SetActive(true);
-                }
-            }
-            else
-            {
-                if (isPlayerInRange)
-                {
-                    isPlayerInRange = false;
-                    kickButton.SetActive(false);
-                }
-            }
+            isPlayerInRange = true;
+            kickButton.SetActive(true);
+        }
+        else if (distance > rangeRadius && isPlayerInRange)
+        {
+            isPlayerInRange = false;
+            kickButton.SetActive(false);
         }
     }
 
     public void OnKickButtonPressed()
     {
-        if (playerTransform != null && isPlayerInRange)
-        {
-            Transform nearestGoal = GetNearestGoal();
-            if (nearestGoal != null)
-            {
-                Vector3 direction = (nearestGoal.position - transform.position).normalized;
-                ballRigidbody.AddForce(direction * kickForce, ForceMode.Impulse);
-                Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(transform, cameraTransitionDelay);
-            }
-        }
+        if (playerTransform == null || !isPlayerInRange) return;
+
+        Transform nearestGoal = GetNearestGoal();
+        if (nearestGoal == null) return;
+
+        Vector3 direction = (nearestGoal.position - transform.position).normalized;
+        ballRigidbody.AddForce(direction * kickForce, ForceMode.Impulse);
+        Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(transform, cameraTransitionDelay);
     }
 
     private Transform GetNearestGoal()
@@ -99,8 +84,7 @@ public class Ball : MonoBehaviour
         {
             if (collision.gameObject.CompareTag(goal.tag))
             {
-                GameObject particle = Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity);
-                Destroy(particle, 3f);
+                Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity).DestroyAfter(3f);
                 break;
             }
         }
@@ -110,5 +94,13 @@ public class Ball : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, rangeRadius);
+    }
+}
+
+public static class GameObjectExtensions
+{
+    public static void DestroyAfter(this GameObject obj, float seconds)
+    {
+        Object.Destroy(obj, seconds);
     }
 }

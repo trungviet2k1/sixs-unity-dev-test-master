@@ -4,34 +4,33 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     public Transform player;
-    public Vector3 offset;
+    public Vector3 offset = new(0, 10, -10);
 
     private Transform defaultCamTarget;
     private Vector3 defaultCamOffset;
     private bool isFollowingPlayer = true;
+    private Transform currentTarget;
 
     void Start()
     {
-        if (offset == Vector3.zero)
-        {
-            offset = new Vector3(0, 10, -10);
-        }
-
         defaultCamTarget = player;
         defaultCamOffset = offset;
+        currentTarget = player;
     }
 
     void LateUpdate()
     {
-        if (player != null)
+        if (currentTarget != null)
         {
-            transform.position = player.position + offset;
-            transform.LookAt(player);
+            transform.position = currentTarget.position + offset;
+            transform.LookAt(currentTarget);
         }
     }
 
     public void SwitchTargetTo(Transform ball, float delay)
     {
+        StopAllCoroutines();
+
         if (!isFollowingPlayer)
         {
             transform.position = ball.position + offset;
@@ -45,12 +44,12 @@ public class CameraFollow : MonoBehaviour
     private IEnumerator WaitAndSwitchTarget(Transform newTarget, float delay)
     {
         isFollowingPlayer = false;
-        player = newTarget;
+        currentTarget = newTarget;
         offset = new Vector3(0, 7, 0);
 
         yield return new WaitForSeconds(delay);
 
-        player = defaultCamTarget;
+        currentTarget = defaultCamTarget;
         offset = defaultCamOffset;
         isFollowingPlayer = true;
     }
