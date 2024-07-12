@@ -18,7 +18,10 @@ public class MovementInput : MonoBehaviour
 
     void Update()
     {
-        HandleMovement();
+        if (Time.timeScale > 0)
+        {
+            HandleMovement();
+        }
     }
 
     void PlayerMoveAndRotation(Vector3 moveDirection)

@@ -1828,8 +1828,8 @@ CharacterController:
   m_Radius: 0.3
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_SkinWidth: 0.0001
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.8, z: 0}
 --- !u!95 &4256491662613172926
 Animator:
@@ -1864,11 +1864,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caa9f165e2b4f1a4f9522501717c095d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocity: 5
+  speed: 5
   desiredRotationSpeed: 0.3
   allowPlayerRotation: 0.1
-  StartAnimatorTime: 0.1
-  StopAnimatorTime: 0.15
 --- !u!114 &8140588757274500128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1882,7 +1880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   joystick: {fileID: 0}
-  velocity: 5
+  speed: 5
   desiredRotationSpeed: 0.3
 --- !u!1 &2454024865832219713
 GameObject:

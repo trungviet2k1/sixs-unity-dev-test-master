@@ -3,18 +3,19 @@ using UnityEngine.SceneManagement;
 
 public class GamesManager : MonoBehaviour
 {
-    public static GamesManager Instance { get; private set; }
-
-    void Awake()
+    void Start()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this);
-        }
-        else
-        {
-            Instance = this;
-        }
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SettingPanel.Instance.LoadDataSetting();
     }
 
     public void Restart()

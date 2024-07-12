@@ -2664,6 +2664,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8971122523998631520}
     m_Modifications:
+    - target: {fileID: 3944085553185639012, guid: 71d04ecfb30e9cb4bbcdc197e2af9a93, type: 3}
+      propertyPath: m_Size.y
+      value: 4.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3944085553185639012, guid: 71d04ecfb30e9cb4bbcdc197e2af9a93, type: 3}
+      propertyPath: m_Center.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3944085553185639012, guid: 71d04ecfb30e9cb4bbcdc197e2af9a93, type: 3}
+      propertyPath: m_Center.y
+      value: 2.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 3944085553185639012, guid: 71d04ecfb30e9cb4bbcdc197e2af9a93, type: 3}
+      propertyPath: m_Center.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5936705279783245063, guid: 71d04ecfb30e9cb4bbcdc197e2af9a93, type: 3}
       propertyPath: m_Name
       value: land soccer field

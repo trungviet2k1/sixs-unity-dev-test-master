@@ -22,6 +22,7 @@ public class Ball : MonoBehaviour
     private Rigidbody ballRigidbody;
     private Transform playerTransform;
     private bool isPlayerInRange = false;
+    private bool isInGoal = false;
 
     private void Start()
     {
@@ -33,7 +34,7 @@ public class Ball : MonoBehaviour
 
     private void Update()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null || isInGoal) return;
 
         float distance = Vector3.Distance(transform.position, playerTransform.position);
         if (distance <= rangeRadius && !isPlayerInRange)
@@ -50,12 +51,12 @@ public class Ball : MonoBehaviour
 
     public void OnKickButtonPressed()
     {
-        if (playerTransform == null || !isPlayerInRange) return;
+        if (playerTransform == null || !isPlayerInRange || isInGoal) return;
 
         Transform nearestGoal = GetNearestGoal();
         if (nearestGoal == null) return;
 
-        SoundManager.Instance.PlayKickBallSound();
+        AudioManager.Instance.PlayKickBallSound();
         Vector3 direction = (nearestGoal.position - transform.position).normalized;
         ballRigidbody.AddForce(direction * kickForce, ForceMode.Impulse);
         Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(transform, cameraTransitionDelay);
@@ -85,8 +86,10 @@ public class Ball : MonoBehaviour
         {
             if (collision.gameObject.CompareTag(goal.tag))
             {
-                SoundManager.Instance.PlayScoringGoalSound();
+                AudioManager.Instance.PlayScoringGoalSound();
                 Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity).DestroyAfter(3f);
+                isInGoal = true;
+                kickButton.SetActive(false);
                 break;
             }
         }
