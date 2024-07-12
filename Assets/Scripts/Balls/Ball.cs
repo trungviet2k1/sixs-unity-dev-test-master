@@ -55,6 +55,7 @@ public class Ball : MonoBehaviour
         Transform nearestGoal = GetNearestGoal();
         if (nearestGoal == null) return;
 
+        SoundManager.Instance.PlayKickBallSound();
         Vector3 direction = (nearestGoal.position - transform.position).normalized;
         ballRigidbody.AddForce(direction * kickForce, ForceMode.Impulse);
         Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(transform, cameraTransitionDelay);
@@ -84,6 +85,7 @@ public class Ball : MonoBehaviour
         {
             if (collision.gameObject.CompareTag(goal.tag))
             {
+                SoundManager.Instance.PlayScoringGoalSound();
                 Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity).DestroyAfter(3f);
                 break;
             }
