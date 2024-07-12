@@ -3,9 +3,10 @@
 [RequireComponent(typeof(CharacterController))]
 public class JoystickMovement : MonoBehaviour
 {
-    public Joystick joystick;
-    public float speed = 5f;
-    public float desiredRotationSpeed = 0.3f;
+    [Header("Values")]
+    [SerializeField] Joystick joystick;
+    [SerializeField] float speed;
+    [SerializeField] float desiredRotationSpeed;
 
     private Animator animator;
     private CharacterController controller;

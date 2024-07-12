@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform player;
-    public Vector3 offset = new(0, 10, -10);
+    [SerializeField] Transform player;
+    [SerializeField] Vector3 offset = new();
 
     private Transform defaultCamTarget;
     private Vector3 defaultCamOffset;

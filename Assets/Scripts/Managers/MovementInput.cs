@@ -3,9 +3,10 @@
 [RequireComponent(typeof(CharacterController))]
 public class MovementInput : MonoBehaviour
 {
-    public float speed = 5f;
-    public float desiredRotationSpeed = 0.3f;
-    public float allowPlayerRotation = 0.1f;
+    [Header("Values")]
+    [SerializeField] float speed;
+    [SerializeField] float desiredRotationSpeed;
+    [SerializeField] float allowPlayerRotation;
 
     private Animator animator;
     private CharacterController controller;

@@ -7,12 +7,12 @@ public class SettingPanel : MonoBehaviour
     public static SettingPanel Instance { get; private set; }
 
     [Header("Settings Panel UI")]
-    public GameObject settingsPanel;
+    [SerializeField] GameObject settingsPanel;
 
     [Header("Audio Settings")]
-    [SerializeField] private AudioMixer audioSettingMixer;
-    [SerializeField] private Slider musicSlider;
-    [SerializeField] private Slider SFXSlider;
+    [SerializeField] AudioMixer audioSettingMixer;
+    [SerializeField] Slider musicSlider;
+    [SerializeField] Slider SFXSlider;
 
     private const string MusicVolumeKey = "musicVolume";
     private const string SFXVolumeKey = "sfxVolume";

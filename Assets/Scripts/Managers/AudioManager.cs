@@ -9,9 +9,9 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioSource SFXSource;
 
     [Header("----- Audio Clip -----")]
-    public AudioClip background;
-    public AudioClip kickBall;
-    public AudioClip goals;
+    [SerializeField] AudioClip background;
+    [SerializeField] AudioClip kickBall;
+    [SerializeField] AudioClip goals;
 
     void Awake()
     {
