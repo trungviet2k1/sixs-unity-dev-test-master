@@ -1,44 +1,55 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Ball : MonoBehaviour
 {
     [Header("Range")]
-    public float rangeRadius = 5f;
+    [SerializeField] float rangeRadius;
 
     [Header("UI Canvas")]
-    public GameObject kickButton;
-    public GameObject autoKickButton;
+    [SerializeField] GameObject kickButton;
+    [SerializeField] GameObject autoKickButton;
 
     [Header("Kick Force")]
-    public float kickForce;
-    public float autoKickCoefficient;
+    [SerializeField] float kickForce;
+    [SerializeField] float autoKickCoefficient;
 
     [Header("Goals")]
-    public Transform[] goals;
+    [SerializeField] Transform[] goals;
 
     [Header("Setup")]
-    public float cameraTransitionDelay = 2f;
-    public GameObject confettiParticleSystem;
+    [SerializeField] float cameraTransitionDelay;
+    [SerializeField] GameObject confettiParticleSystem;
 
+    [Header("Cooldown")]
+    [SerializeField] Image coolDownIcon;
+    [SerializeField] TextMeshProUGUI buttonText;
+    [SerializeField] float autoKickCooldownTime = 10f;
+    
     private Rigidbody ballRigidbody;
     private Transform playerTransform;
+    private float autoKickCooldown = 0f;
+    private bool canAutoKick = true;
     private bool isPlayerInRange = false;
     private bool isInGoal = false;
 
     private void Start()
     {
+        coolDownIcon.fillAmount = 0;
         kickButton.SetActive(false);
         autoKickButton.SetActive(true);
         ballRigidbody = GetComponent<Rigidbody>();
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         kickButton.GetComponent<Button>().onClick.AddListener(OnKickButtonPressed);
         autoKickButton.GetComponent<Button>().onClick.AddListener(OnAutoKickButtonPressed);
+
+        buttonText = GameObject.Find("ButtonText").GetComponent<TextMeshProUGUI>();
     }
 
     private void Update()
     {
-        if (playerTransform == null || isInGoal) return;
+        if (playerTransform == null) return;
 
         float distance = Vector3.Distance(transform.position, playerTransform.position);
         if (distance <= rangeRadius && !isPlayerInRange)
@@ -50,6 +61,21 @@ public class Ball : MonoBehaviour
         {
             isPlayerInRange = false;
             kickButton.SetActive(false);
+        }
+
+        if (autoKickCooldown > 0)
+        {
+            autoKickCooldown -= Time.deltaTime;
+            coolDownIcon.fillAmount = autoKickCooldown / autoKickCooldownTime;
+            autoKickButton.GetComponent<Button>().interactable = false;
+            buttonText.text = "Auto Kick \n" + autoKickCooldown.ToString("F1") + "s";
+        }
+        else
+        {
+            autoKickCooldown = 0f;
+            canAutoKick = true;
+            autoKickButton.GetComponent<Button>().interactable = true;
+            buttonText.text = "Auto Kick";
         }
     }
 
@@ -68,7 +94,7 @@ public class Ball : MonoBehaviour
 
     public void OnAutoKickButtonPressed()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null || !canAutoKick) return;
 
         Ball farthestBallScript = GetFarthestBall();
         if (farthestBallScript == null || farthestBallScript.isInGoal) return;
@@ -80,8 +106,9 @@ public class Ball : MonoBehaviour
         Vector3 direction = (nearestGoal.position - farthestBallScript.transform.position).normalized;
         farthestBallScript.ballRigidbody.AddForce(autoKickCoefficient * kickForce * direction, ForceMode.Impulse);
         Camera.main.GetComponent<CameraFollow>().SwitchTargetTo(farthestBallScript.transform, cameraTransitionDelay);
-    }
 
+        autoKickCooldown = autoKickCooldownTime;
+    }
 
     private Transform GetNearestGoal()
     {

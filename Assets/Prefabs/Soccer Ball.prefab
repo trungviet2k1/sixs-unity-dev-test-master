@@ -173,9 +173,10 @@ MonoBehaviour:
   kickButton: {fileID: 0}
   autoKickButton: {fileID: 0}
   kickForce: 13
-  autoKickCoefficient: 0.3
+  autoKickCoefficient: 0.2
   goals:
   - {fileID: 0}
   - {fileID: 0}
   cameraTransitionDelay: 2
   confettiParticleSystem: {fileID: 6661073620808731575, guid: 7d05e4127f42c914aa5d5902442e058e, type: 3}
+  autoKickCooldownTime: 10
