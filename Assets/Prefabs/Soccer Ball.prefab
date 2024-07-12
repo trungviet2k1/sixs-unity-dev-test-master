@@ -170,8 +170,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangeRadius: 1.5
-  kickButton: {fileID: 0}
-  autoKickButton: {fileID: 0}
   kickForce: 13
   autoKickCoefficient: 0.2
   goals:
@@ -179,4 +177,8 @@ MonoBehaviour:
   - {fileID: 0}
   cameraTransitionDelay: 2
   confettiParticleSystem: {fileID: 6661073620808731575, guid: 7d05e4127f42c914aa5d5902442e058e, type: 3}
+  kickButton: {fileID: 0}
+  autoKickButton: {fileID: 0}
+  coolDownIcon: {fileID: 0}
+  textCooldown: {fileID: 0}
   autoKickCooldownTime: 10

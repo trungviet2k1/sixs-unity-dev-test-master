@@ -7,26 +7,26 @@ public class Ball : MonoBehaviour
     [Header("Range")]
     [SerializeField] float rangeRadius;
 
-    [Header("UI Canvas")]
-    [SerializeField] GameObject kickButton;
-    [SerializeField] GameObject autoKickButton;
-
-    [Header("Kick Force")]
+    [Header("Thrust Force")]
     [SerializeField] float kickForce;
     [SerializeField] float autoKickCoefficient;
 
     [Header("Goals")]
     [SerializeField] Transform[] goals;
 
-    [Header("Setup")]
+    [Header("Effects")]
     [SerializeField] float cameraTransitionDelay;
     [SerializeField] GameObject confettiParticleSystem;
 
+    [Header("UI Canvas")]
+    [SerializeField] GameObject kickButton;
+    [SerializeField] GameObject autoKickButton;
+
     [Header("Cooldown")]
     [SerializeField] Image coolDownIcon;
-    [SerializeField] TextMeshProUGUI buttonText;
+    [SerializeField] TextMeshProUGUI textCooldown;
     [SerializeField] float autoKickCooldownTime = 10f;
-    
+
     private Rigidbody ballRigidbody;
     private Transform playerTransform;
     private float autoKickCooldown = 0f;
@@ -36,21 +36,40 @@ public class Ball : MonoBehaviour
 
     private void Start()
     {
-        coolDownIcon.fillAmount = 0;
-        kickButton.SetActive(false);
-        autoKickButton.SetActive(true);
-        ballRigidbody = GetComponent<Rigidbody>();
-        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
-        kickButton.GetComponent<Button>().onClick.AddListener(OnKickButtonPressed);
-        autoKickButton.GetComponent<Button>().onClick.AddListener(OnAutoKickButtonPressed);
-
-        buttonText = GameObject.Find("ButtonText").GetComponent<TextMeshProUGUI>();
+        InitializeComponents();
+        ConfigureButtons();
     }
 
     private void Update()
     {
         if (playerTransform == null) return;
 
+        if (!isInGoal)
+        {
+            UpdatePlayerDistance();
+        }
+
+        UpdateCooldown();
+    }
+
+    private void InitializeComponents()
+    {
+        coolDownIcon.fillAmount = 0;
+        kickButton.SetActive(false);
+        autoKickButton.SetActive(true);
+        ballRigidbody = GetComponent<Rigidbody>();
+        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        textCooldown = GameObject.Find("ButtonText").GetComponent<TextMeshProUGUI>();
+    }
+
+    private void ConfigureButtons()
+    {
+        kickButton.GetComponent<Button>().onClick.AddListener(OnKickButtonPressed);
+        autoKickButton.GetComponent<Button>().onClick.AddListener(OnAutoKickButtonPressed);
+    }
+
+    private void UpdatePlayerDistance()
+    {
         float distance = Vector3.Distance(transform.position, playerTransform.position);
         if (distance <= rangeRadius && !isPlayerInRange)
         {
@@ -62,20 +81,23 @@ public class Ball : MonoBehaviour
             isPlayerInRange = false;
             kickButton.SetActive(false);
         }
+    }
 
+    private void UpdateCooldown()
+    {
         if (autoKickCooldown > 0)
         {
             autoKickCooldown -= Time.deltaTime;
             coolDownIcon.fillAmount = autoKickCooldown / autoKickCooldownTime;
             autoKickButton.GetComponent<Button>().interactable = false;
-            buttonText.text = "Auto Kick \n" + autoKickCooldown.ToString("F1") + "s";
+            textCooldown.text = "Auto Kick \n" + autoKickCooldown.ToString("F1") + "s";
         }
         else
         {
             autoKickCooldown = 0f;
             canAutoKick = true;
             autoKickButton.GetComponent<Button>().interactable = true;
-            buttonText.text = "Auto Kick";
+            textCooldown.text = "Auto Kick";
         }
     }
 
@@ -155,12 +177,21 @@ public class Ball : MonoBehaviour
         {
             if (collision.gameObject.CompareTag(goal.tag))
             {
-                AudioManager.Instance.PlayScoringGoalSound();
-                Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity).DestroyAfter(3f);
-                isInGoal = true;
-                kickButton.SetActive(false);
+                HandleGoalCollision(collision);
                 break;
             }
+        }
+    }
+
+    private void HandleGoalCollision(Collision collision)
+    {
+        if (!isInGoal)
+        {
+            ScoreManager.Instance.UpdateScore();
+            AudioManager.Instance.PlayScoringGoalSound();
+            Instantiate(confettiParticleSystem, collision.contacts[0].point, Quaternion.identity).DestroyAfter(3f);
+            isInGoal = true;
+            kickButton.SetActive(false);
         }
     }
 
