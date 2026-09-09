@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
@@ -31,6 +31,7 @@ public class SettingPanel : MonoBehaviour
 
     void Start()
     {
+        CloseSettingPanel();
         LoadDataSetting();
         musicSlider.onValueChanged.AddListener(delegate { SetMusicVolume(); });
         SFXSlider.onValueChanged.AddListener(delegate { SetSFXVolume(); });
@@ -46,6 +47,17 @@ public class SettingPanel : MonoBehaviour
     {
         settingsPanel.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    public void QuitGame()
+    {
+        Time.timeScale = 1f;
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     public void SetMusicVolume()

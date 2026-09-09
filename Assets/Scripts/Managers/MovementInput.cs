@@ -4,17 +4,33 @@
 public class MovementInput : MonoBehaviour
 {
     [Header("Values")]
+    [SerializeField] Joystick joystick;
     [SerializeField] float speed;
     [SerializeField] float desiredRotationSpeed;
-    [SerializeField] float allowPlayerRotation;
 
     private Animator animator;
     private CharacterController controller;
+    private bool useJoystick;
 
     void Start()
     {
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
+
+        // Quyết định dùng joystick hay WASD tại thời điểm build / compile
+#if UNITY_ANDROID
+        useJoystick = true;
+#elif UNITY_STANDALONE_WIN || UNITY_STANDALONE
+        useJoystick = false;
+#elif UNITY_EDITOR
+        // Trong Editor: dùng Application.isMobilePlatform để mô phỏng, hoặc chỉnh tay nếu cần
+        useJoystick = Application.isMobilePlatform;
+#else
+        useJoystick = Application.isMobilePlatform;
+#endif
+
+        if (joystick != null)
+            joystick.gameObject.SetActive(useJoystick);
     }
 
     void Update()
@@ -36,15 +52,30 @@ public class MovementInput : MonoBehaviour
 
     void HandleMovement()
     {
-        float InputX = Input.GetAxis("Horizontal");
-        float InputZ = Input.GetAxis("Vertical");
-        float speed = new Vector2(InputX, InputZ).sqrMagnitude;
+        float horizontal = 0f;
+        float vertical = 0f;
 
-        animator.SetFloat("Speed", speed);
-
-        if (speed > allowPlayerRotation)
+        // Nếu build cho Android (hoặc đang mô phỏng mobile trong Editor) => lấy từ joystick.
+        // Ngược lại => dùng WASD / Arrow keys (Input.GetAxis).
+        if (useJoystick && joystick != null && joystick.gameObject.activeInHierarchy)
         {
-            PlayerMoveAndRotation(new Vector3(InputX, 0f, InputZ));
+            horizontal = joystick.Horizontal;
+            vertical = joystick.Vertical;
+        }
+        else
+        {
+            horizontal = Input.GetAxisRaw("Horizontal");
+            vertical = Input.GetAxisRaw("Vertical");
+        }
+
+        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+        float magnitude = direction.magnitude;
+
+        animator.SetFloat("Speed", magnitude);
+
+        if (magnitude > 0f)
+        {
+            PlayerMoveAndRotation(direction);
         }
     }
 }
